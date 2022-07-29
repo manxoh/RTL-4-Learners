@@ -61,7 +61,7 @@ module testbench;
       @ (posedge reset_done);
       $display("[%03f] Reset done", $realtime);
 
-      //Pipeline takes 3 clock cycles to compute result, extra clock for registering input 
+      //Pipeline takes 3 clock cycles to compute result, extra clock for registering input and output 
       @ (posedge clock);
       @ (posedge clock);
       @ (posedge clock);

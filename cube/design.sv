@@ -9,24 +9,24 @@ module cube (input clock,
   logic [31:0] num2;
   logic [31:0] num3;
   
-  assign result = num3;
-  
   always_ff @(posedge clock) begin
     if (reset == 1'b1) begin
     	num0 <= 32'b0;
-      	num1 <= 32'b0;
-      	num2 <= 32'b0;
-      	num3 <= 32'b0;
+      num1 <= 32'b0;
+      num2 <= 32'b0;
+      num3 <= 32'b0;
     end
     else begin
+      //stage 1
       num0 <= num;
+      num1 <= num;
       
-      num1 <= num0;
+      //state 2
+      num2 <= num1;
+      num3 <= num1*num0;
       
-      num2 <= num0*num0;
-      
-      num3 <= num2*num1;
-      
+      //stage 3
+      result <= num3*num2;
     end
       
   end
