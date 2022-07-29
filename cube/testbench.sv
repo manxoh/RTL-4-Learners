@@ -17,20 +17,7 @@ module testbench;
                 .result(result)
                );
   
-    initial begin
-      // Dump waves
-      $dumpfile("dump.vcd");
-      $dumpvars(0, testbench);
-      clock = 1'b0;
-      reset = 1'b0;
-      num = 32'b0;
-      reset_done = 1'b0;
-      #10 reset = 1'b1;
-      #20 reset = 1'b0;
-      #5 reset_done = 1'b1;
-    end
-  
-  function automatic logic [31:0] power(logic [31:0] base, integer exp);
+    function automatic logic [31:0] power(logic [31:0] base, integer exp);
       logic [31:0] res = 32'h1;
       begin
         while (exp--) begin
@@ -39,39 +26,54 @@ module testbench;
         return res;
       end
     endfunction
+  	
+  	initial begin
+      // Dump waves
+      $dumpfile("dump.vcd");
+      $dumpvars(0, testbench);
+    end
+  
+  	initial begin
+      reset <= 1'b0;
+      num <= 32'b0;
+      reset_done <= 1'b0;
+    end
+  
+  	initial begin
+      #4 reset <= 1'b1;
+      #12 reset <= 1'b0;
+      reset_done <= 1'b1;
+    end
   
   	initial begin
       fork
       begin
+        //wait until reset is done
+        @ (posedge reset_done);
         forever begin
           @ (posedge clock) begin
-            if (reset_done == 1'b1) begin
-              num = num + 1'b1;
-              result_expected.push_back(power(num, 3));
-            end
+            num = num + 1'b1;
+            result_expected.push_back(power(num, 3));
           end
         end
       end
       
       begin
         //wait until reset is done
-        while (!reset_done) begin
-          @ (posedge clock);
-        end
-        $display("[%3f] Reset done", $realtime);
+        @ (posedge reset_done);
+        $display("[%03f] Reset done", $realtime);
         
-        //Pipeline takes 3 clock cyles to compute result 
+        //Pipeline takes 3 clock cycles to compute result, extra clock for registering input 
         @ (posedge clock);
         @ (posedge clock);
         @ (posedge clock);
+        @ (posedge clock);        
         
         forever begin
           @ (posedge clock) begin
-            if (reset_done == 1'b1) begin
-              front = result_expected.pop_front();
-              status =  (result != front) ? "FAIL":"PASS";
-              $display("[%3f] %s expected %d actual %d", $realtime, status, front, result);
-            end
+            front = result_expected.pop_front();
+            status =  (result != front) ? "FAIL":"PASS";
+            $display("[%03f] %s expected %d actual %d", $realtime, status, front, result);
           end
         end
       end
@@ -80,8 +82,9 @@ module testbench;
       disable fork;
 	end
   
-   always begin
-     #5 clock <= !clock;
+   initial begin
+     clock <= 1'b0;
+     forever #5 clock <= !clock;
    end
   
 endmodule
