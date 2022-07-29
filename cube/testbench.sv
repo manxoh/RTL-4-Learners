@@ -46,41 +46,35 @@ module testbench;
     end
   
   	initial begin
-      fork
-      begin
-        //wait until reset is done
-        @ (posedge reset_done);
-        forever begin
-          @ (posedge clock) begin
-            num = num + 1'b1;
-            result_expected.push_back(power(num, 3));
-          end
+      //wait until reset is done
+      @ (posedge reset_done);
+      forever begin
+        @ (posedge clock) begin
+          num = num + 1'b1;
+          result_expected.push_back(power(num, 3));
         end
       end
+    end
       
-      begin
-        //wait until reset is done
-        @ (posedge reset_done);
-        $display("[%03f] Reset done", $realtime);
-        
-        //Pipeline takes 3 clock cycles to compute result, extra clock for registering input 
-        @ (posedge clock);
-        @ (posedge clock);
-        @ (posedge clock);
-        @ (posedge clock);        
-        
-        forever begin
-          @ (posedge clock) begin
-            front = result_expected.pop_front();
-            status =  (result != front) ? "FAIL":"PASS";
-            $display("[%03f] %s expected %d actual %d", $realtime, status, front, result);
-          end
+	initial begin
+      //wait until reset is done
+      @ (posedge reset_done);
+      $display("[%03f] Reset done", $realtime);
+
+      //Pipeline takes 3 clock cycles to compute result, extra clock for registering input 
+      @ (posedge clock);
+      @ (posedge clock);
+      @ (posedge clock);
+      @ (posedge clock);        
+
+      forever begin
+        @ (posedge clock) begin
+          front = result_expected.pop_front();
+          status =  (result != front) ? "FAIL":"PASS";
+          $display("[%03f] %s expected %d actual %d", $realtime, status, front, result);
         end
       end
-        
-      join_any
-      disable fork;
-	end
+    end
   
    initial begin
      clock <= 1'b0;
