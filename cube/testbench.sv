@@ -34,15 +34,15 @@ module testbench;
     end
   
   	initial begin
-      reset <= 1'b0;
-      num <= 32'b0;
-      reset_done <= 1'b0;
+      reset = 1'b0;
+      num = 32'b0;
+      reset_done = 1'b0;
     end
   
   	initial begin
-      #4 reset <= 1'b1;
-      #12 reset <= 1'b0;
-      reset_done <= 1'b1;
+      #4 reset = 1'b1;
+      #12 reset = 1'b0;
+      reset_done = 1'b1;
     end
   
   	initial begin
@@ -77,8 +77,8 @@ module testbench;
     end
   
    initial begin
-     clock <= 1'b0;
-     forever #5 clock <= !clock;
+     clock = 1'b0;
+     forever #5 clock = !clock;
    end
   
 endmodule
