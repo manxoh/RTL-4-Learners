@@ -7,4 +7,6 @@ Basic RTL for learners.
   5. Read Modify Write - ToDo
   6. FIFO - ToDo
   7. NRZI - ToDo
-  8. APB - ToDo  
+  8. AHB - ToDo
+  9. APB - ToDo
+  10. Sequence Detector  
