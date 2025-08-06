@@ -2,7 +2,7 @@ module axis_source #(AXIS_WIDTH = 32)
                                   (input clk,
                                    input reset,
                                    input en,
-                                   input [AXIS_WIDTH-1:0] data_in,
+                                   input [AXIS_WIDTH-1:0] init_data,
                                    output m_axis_tvalid,
                                    output [AXIS_WIDTH-1:0] m_axis_tdata,
                                    input m_axis_tready);
@@ -22,17 +22,34 @@ module axis_source #(AXIS_WIDTH = 32)
    always @ (posedge clk) begin
       if (reset) begin
          valid_i <= 1'b0;
+      end
+      else begin 
+         if (en) begin  //start driving valid high
+            valid_i <= 1'b1;
+         end
+         else begin
+            if (valid_i && m_axis_tready) begin //handshake done
+               valid_i <= 1'b0;
+            end
+         end
+      end
+   end
+
+   always @ (posedge clk) begin
+      if (reset) begin
          data_i <= {AXIS_WIDTH{1'b0}};
       end
-      else if ((valid_i == 1'b0) && (en == 1'b1)) begin  //start driving output data and valid
-         valid_i <= 1'b1;
-         data_i <= data_in;
-      end
-      else if ((valid_i == 1'b1) && (m_axis_tready == 1'b1) && (en == 1'b1)) begin //drive new output data when handshake is done
-         data_i <= data_next;
-      end
-      else if ((valid_i == 1'b1) && (m_axis_tready == 1'b1) && (en == 1'b0)) begin //enable is deasserted, but wait for handshake to complete to deassert valid
-         valid_i <= 1'b0;
+      else begin
+         if (en) begin
+            if (valid_i && m_axis_tready) begin //handshake done, data can be changed
+               data_i <= data_next;
+            end
+            else begin
+               if (~valid_i) begin
+                  data_i <= init_data + 1'b1;
+               end
+            end
+         end
       end
    end
 
