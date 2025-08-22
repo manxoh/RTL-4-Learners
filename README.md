@@ -9,4 +9,6 @@ Basic RTL for learners.
   7. NRZI - ToDo
   8. AHB - ToDo
   9. APB - ToDo
-  10. Sequence Detector  
+  10. Sequence Detector
+  11. Adaptive Filter - LMS (ToDo)
+  12. Cordic - (ToDo)  
